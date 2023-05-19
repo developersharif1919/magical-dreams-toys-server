@@ -43,6 +43,7 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result)
     })
+    // Single Toys 
     app.get('/alltoys/:id', async (req, res) => {
       const subcategoryId = req.params.id;
       const query = { 'subcategories.id': subcategoryId };
@@ -56,6 +57,18 @@ async function run() {
       res.send(result);
     });
 
+   app.get('/mytoys', async(req, res)=>{
+    console.log(req.query.sellerEmail)
+    const {sellerEmail} = req.query;
+
+    let query = {};
+    if (sellerEmail) {
+      query['subcategories.sellerEmail'] = sellerEmail;
+    }
+
+    const result = await toysCollection.find(query).toArray();
+    res.send(result)
+   })
 
     app.post('/alltoys', async (req, res) => {
       const toyInformation = req.body;
