@@ -34,7 +34,12 @@ async function run() {
     const toysCollection = client.db('magicalDreamsToys').collection('toys');
 
     app.get('/toys', async (req, res) => {
-      const cursor = toysCollection.find();
+      const { search } = req.query;
+      let query = {};
+      if (search) {
+        query = { 'subcategories.name': { $regex: search, $options: 'i' } };
+      }
+      const cursor = toysCollection.find(query);
       const result = await cursor.toArray();
       res.send(result)
     })
@@ -46,7 +51,7 @@ async function run() {
   const subcategoryId = uuidv4();
 
        // Assign the ID to the subcategory object
-  toyInformation.category.subcategories[0].id = subcategoryId;
+  toyInformation.subcategories[0].id = subcategoryId;
 
       const result = await toysCollection.insertOne(toyInformation);
       res.send(result)
