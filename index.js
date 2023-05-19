@@ -33,7 +33,7 @@ async function run() {
 
     const toysCollection = client.db('magicalDreamsToys').collection('toys');
 
-    app.get('/toys', async (req, res) => {
+    app.get('/alltoys', async (req, res) => {
       const { search } = req.query;
       let query = {};
       if (search) {
@@ -43,19 +43,37 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result)
     })
+    app.get('/alltoys/:id', async (req, res) => {
+      const subcategoryId = req.params.id;
+      const query = { 'subcategories.id': subcategoryId };
+      const options = {
+        projection: {
+          _id: 0
 
-    app.post('/toys', async (req, res) => {
+        }
+      }
+      const result = await toysCollection.findOne(query, options);
+      res.send(result);
+    });
+
+
+    app.post('/alltoys', async (req, res) => {
       const toyInformation = req.body;
 
       // Generate a new ID for the subcategory
-  const subcategoryId = uuidv4();
+      const subcategoryId = uuidv4();
 
-       // Assign the ID to the subcategory object
-  toyInformation.subcategories[0].id = subcategoryId;
+      // Assign the ID to the subcategory object
+      toyInformation.subcategories[0].id = subcategoryId;
 
       const result = await toysCollection.insertOne(toyInformation);
       res.send(result)
     })
+
+
+
+
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
