@@ -56,7 +56,7 @@ async function run() {
       const result = await toysCollection.findOne(query, options);
       res.send(result);
     });
-
+// My Toys
    app.get('/mytoys', async(req, res)=>{
     console.log(req.query.sellerEmail)
     const {sellerEmail} = req.query;
@@ -84,6 +84,13 @@ async function run() {
     })
 
 
+    // Delete My Toys
+    app.delete('/mytoys/:id', async(req, res)=>{
+      const subcategoryId = req.params.id;
+      const query = { 'subcategories.id': subcategoryId };
+      const result = await toysCollection.deleteOne(query);
+      res.send(result)
+    })
 
 
 
