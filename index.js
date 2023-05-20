@@ -56,19 +56,19 @@ async function run() {
       const result = await toysCollection.findOne(query, options);
       res.send(result);
     });
-// My Toys
-   app.get('/mytoys', async(req, res)=>{
-    console.log(req.query.sellerEmail)
-    const {sellerEmail} = req.query;
+    // My Toys
+    app.get('/mytoys', async (req, res) => {
+      console.log(req.query.sellerEmail)
+      const { sellerEmail } = req.query;
 
-    let query = {};
-    if (sellerEmail) {
-      query['subcategories.sellerEmail'] = sellerEmail;
-    }
+      let query = {};
+      if (sellerEmail) {
+        query['subcategories.sellerEmail'] = sellerEmail;
+      }
 
-    const result = await toysCollection.find(query).toArray();
-    res.send(result)
-   })
+      const result = await toysCollection.find(query).toArray();
+      res.send(result)
+    })
 
     app.post('/alltoys', async (req, res) => {
       const toyInformation = req.body;
@@ -83,9 +83,23 @@ async function run() {
       res.send(result)
     })
 
+    // Using For Shop By Category Part
+    app.get('/tabtoys', async (req, res) => {
+      console.log(req.query.subCName)
+      const { subCName } = req.query;
+      let query = {};
+      if (subCName) {
+        query['subcategories.subCName'] = subCName;
+      }
+
+      const result = await toysCollection.find(query).toArray();
+      res.send(result)
+    });
+
+
 
     // Delete My Toys
-    app.delete('/mytoys/:id', async(req, res)=>{
+    app.delete('/mytoys/:id', async (req, res) => {
       const subcategoryId = req.params.id;
       const query = { 'subcategories.id': subcategoryId };
       const result = await toysCollection.deleteOne(query);
