@@ -106,7 +106,23 @@ async function run() {
       res.send(result)
     })
 
-
+    // Update Data
+    app.patch('/updatetoys/:id', async (req, res) => {
+      const subcategoryId = req.params.id;
+      const body = req.body
+      console.log(body)
+      const filter = { 'subcategories.id': subcategoryId };
+      const options = {upsert: true}
+        const updatedToyInfo = {
+            $set: {
+                price:body.price,
+                availableQuantity:body.availableQuantity,
+                detailDescription: body.detailDescription
+            }
+        }
+        const result = await toysCollection.updateOne(filter, updatedToyInfo, options );
+        res.send(result);
+    });
 
 
     // Send a ping to confirm a successful connection
