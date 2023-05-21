@@ -34,7 +34,7 @@ async function run() {
     const toysCollection = client.db('magicalDreamsToys').collection('toys');
 
 
-    
+
     app.get('/alltoys', async (req, res) => {
       const { search, sort } = req.query;
       let query = {};
@@ -121,21 +121,33 @@ async function run() {
     })
 
     // Update Data
+
     app.patch('/updatetoys/:id', async (req, res) => {
-      const subcategoryId = req.params.id;
-      const body = req.body
-      console.log(body)
-      const filter = { 'subcategories.id': subcategoryId };
-      const options = { upsert: true }
-      const updatedToyInfo = {
-        $set: {
-          price: body.price,
-          availableQuantity: body.availableQuantity,
-          detailDescription: body.detailDescription
+      try {
+        const subcategoryId = req.params.id;
+        const { price, availableQuantity, detailDescription } = req.body;
+        
+        // Find the toy within the subcategories array using subcategoryId
+        const toy = await toysCollection.findOneAndUpdate(
+          { 'subcategories.id': subcategoryId },
+          {
+            $set: {
+              'subcategories.$.price': price,
+              'subcategories.$.availableQuantity': availableQuantity,
+              'subcategories.$.detailDescription': detailDescription
+            }
+          },
+          { returnOriginal: false } // Return the updated document
+        );
+        
+        if (toy) {
+          res.json(toy);
+        } else {
+          res.status(404).json({ error: 'Toy not found' });
         }
+      } catch (error) {
+        res.status(500).json({ error: 'An error occurred' });
       }
-      const result = await toysCollection.updateOne(filter, updatedToyInfo, options);
-      res.send(result);
     });
 
 
