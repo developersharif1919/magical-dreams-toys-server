@@ -33,16 +33,30 @@ async function run() {
 
     const toysCollection = client.db('magicalDreamsToys').collection('toys');
 
+
+    
     app.get('/alltoys', async (req, res) => {
-      const { search } = req.query;
+      const { search, sort } = req.query;
       let query = {};
+
       if (search) {
         query = { 'subcategories.name': { $regex: search, $options: 'i' } };
       }
-      const cursor = toysCollection.find(query);
+
+      const sortOptions = {};
+
+      if (sort === 'asc') {
+        sortOptions['subcategories.price'] = 1;
+      } else if (sort === 'desc') {
+        sortOptions['subcategories.price'] = -1;
+      }
+
+      const cursor = toysCollection.find(query).sort(sortOptions);
       const result = await cursor.toArray();
-      res.send(result)
-    })
+
+      res.send(result);
+    });
+
     // Single Toys 
     app.get('/alltoys/:id', async (req, res) => {
       const subcategoryId = req.params.id;
@@ -112,16 +126,16 @@ async function run() {
       const body = req.body
       console.log(body)
       const filter = { 'subcategories.id': subcategoryId };
-      const options = {upsert: true}
-        const updatedToyInfo = {
-            $set: {
-                price:body.price,
-                availableQuantity:body.availableQuantity,
-                detailDescription: body.detailDescription
-            }
+      const options = { upsert: true }
+      const updatedToyInfo = {
+        $set: {
+          price: body.price,
+          availableQuantity: body.availableQuantity,
+          detailDescription: body.detailDescription
         }
-        const result = await toysCollection.updateOne(filter, updatedToyInfo, options );
-        res.send(result);
+      }
+      const result = await toysCollection.updateOne(filter, updatedToyInfo, options);
+      res.send(result);
     });
 
 
